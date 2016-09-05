@@ -5,6 +5,8 @@
  * @param {obj} domain:$作为属性绑定到domain上
  */
 
+var w = {};
+
 !function (domain) {
     domain.$ = function () {
         if (arguments.length === 0)
@@ -15,7 +17,7 @@
         if (arguments[0] instanceof HTMLElement) {
             return new Element([arguments[0]]);
         }
-        if(typeof arguments[0]==='function'){
+        if (typeof arguments[0] === 'function') {
             //todo after event done
         }
 
@@ -91,14 +93,16 @@
             });
             return new Element(arr);
         },
-        index:function () {
-            if(arguments.length===0){
+        index: function () {
+            if (arguments.length === 0) {
                 var nodeList = this[0].parentNode.children,
-                    length = nodeList.length;
-                for(var i=0;i<length;i++){
-                    //todo
-                }
-            }  else{
+                    arr = Array.prototype.slice.call(nodeList, 0);
+                return arr.indexOf(this[0]);
+            } else if (typeof arguments[0] === 'string') {
+                return Array.prototype.slice.call(this, 0).indexOf(document.querySelectorAll(arguments[0])[0]);
+            } else {
+                var ele = arguments[0] instanceof HTMLElement ? arguments[0] : arguments[0][0];
+                return Array.prototype.slice.call(this, 0).indexOf(ele);
 
             }
         },
@@ -120,7 +124,7 @@
                 nodes = null,
                 nodesLength = 0;
             if (match) {
-                nodes = $(arguments[0]);
+                nodes = domain.$(arguments[0]);
                 nodesLength = nodes.length
             }
             while (node !== document.body.parentNode) {//不是html元素则重复上溯
@@ -134,13 +138,16 @@
                         }
                     }
                     if (has) {
-                        return $(node);
+                        return domain.$(node);
                     }
                 } else {
                     arr.push(node);
                 }
             }
             return arr;
+        },
+        append: function () {
+
         },
         is: function () {
             if (typeof arguments[0] === 'string') {
@@ -170,30 +177,40 @@
             else if (typeof arguments[0] === 'string') {
                 var sel = arguments[0];
                 this.each(function () {
-                    if ($(this).is(sel)) {
-                        $(this).remove();
+                    if (domain.$(this).is(sel)) {
+                        domain.$(this).remove();
                     }
                 })
             }
             return this;
         },
-        clone: function () {    //todo
-
+        clone: function () {
+            return new Element([this[0].cloneNode(true)]);
         },
         after: function () {
             var arg = arguments[0];
             if (arg instanceof Element) {
-                var that = this;
-                var afterNode = that[0].nextElementSibling;
 
-                that.each(function (ele, index) {
-                    console.log(index);     //todo copy多份到匹配集合中的元素后&&前
-                    arg.each(function () {
-                        ele.parentNode.insertBefore(this, afterNode);
-                    })
+                this.each(function (target, b) {
+                    var afterNode = target.nextElementSibling;
+                    console.log(afterNode && afterNode.innerText)
+                    if (!afterNode) {
+                        arg.each(function (ele) {
+                            target.parentNode.appendChild(b === 0 ? ele : ele.cloneNode(true));
+                        })
+                    }
+                    else {
+                        // console.log(afterNode.innerText);
+                        //todo copy 前
+                        arg.each(function (ele) {
+                            afterNode.parentNode.insertBefore(b === 0 ? ele : ele.cloneNode(true), afterNode);
+                        })
+                    }
+
+
                 })
             }
-            else if (arg instanceof HTMLElement) {
+            else if (arg instanceof HTMLElement) {//todo
                 this[0].parentNode.insertBefore(arg, this[0].nextElementSibling);
             }
             else if (typeof arg === 'string') {
@@ -259,14 +276,14 @@
             });
         },
         css: function () {
-            if (arguments.length === 1 && typeof arguments[0]!=='object')
+            if (arguments.length === 1 && typeof arguments[0] !== 'object')
                 return getComputedStyle(this[0])[arguments[0]];
             else {
                 var arg = arguments;
 
                 this.each(function (ele, i) {
-                    if(typeof arg[0]==='object'){
-                        for(var attr in arg[0]){
+                    if (typeof arg[0] === 'object') {
+                        for (var attr in arg[0]) {
                             this.style[attr] = arg[0][attr];
                         }
                     }
@@ -356,6 +373,7 @@
             }
             return out;
         }
+
         function deepCopy(out) {
             out = out || {};
 
@@ -367,6 +385,7 @@
 
                 for (var key in obj) {
                     if (obj.hasOwnProperty(key)) {
+                        // console.log(key)
                         if (typeof obj[key] === 'object')
                             out[key] = deepCopy(out[key], obj[key]);
                         else
@@ -379,6 +398,5 @@
     }
 
 
-
-}(window);
+}(w);
 
