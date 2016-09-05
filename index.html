@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .a {
+            color: blue;
+            display: inline;
+            border: 3px solid red;
+            /*display: none;*/
+        }
+    </style>
+
+</head>
+<body>
+<div>
+    <div class="a">1</div>
+    <div class="a">2</div>
+    <div class="a">3</div>
+    <div class="a">4</div>
+</div>
+<div>
+    <div class="a">1</div>
+    <div class="a">2</div>
+    <div class="a">3</div>
+    <div class="a">4</div>
+</div>
+<div>
+    <div class="a">1</div>
+    <div class="a">2</div>
+    <div class="a">3</div>
+    <div class="a aa">4</div>
+</div>
+
+<div class="bb"></div>
+<div class="bb">324
+    <div>
+        <div class="a">1</div>
+        <div class="a">2</div>
+        <div class="a">3</div>
+        <div class="a aa">4</div>
+    </div>
+
+</div>
+
+
+<script src="js/dev.js"></script>
+<!--<script src="js/jquery.js"></script>-->
+
+<script>
+    //    var log = console.log;
+//    $('.a').remove('div');
+
+    $('.a').css(
+         'fontSize','88px'
+     );
+    //    console.log($('.a').is($('div')))
+    //    $('.a').remove();
+    //  console.log($('.bb').find('*').find('.a'))  ;
+    //        $('.bb').after($('.a'));
+    //    $('.a').attr('class', 'dfdf');
+    //
+    //    console.log($($('.a')[0]).text());
+    //    console.log($('.a')[0]);
+    //
+    //    console.log($('.a').eq(1).css('color', 'red'))
+    //
+    //    console.log($('.bb').find('.a').show())
+    //    $('.bb').find('.a').fadeIn(2000);
+
+    //    console.log($('.a').parents('.bb'))
+    //    $('.a').addClass('c1')
+    //    $('.a').toggleClass('c1')
+    //    console.log($('.a').text('2222'))
+    //    console.log($('.a').html())
+    //    console.log($('.a').html('33'))
+//    $.fn.extend({
+//        hello:function(){console.log('hello');}
+//    });
+//
+//    console.log($.fn.hello())
+    
+    $(function () {
+        
+    });
+    console.log($('.a').index())
+
+</script>
+</body>
+</html>
