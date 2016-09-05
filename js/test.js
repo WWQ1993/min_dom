@@ -52,7 +52,7 @@ describe("DOM_operation", function () {
     it("clone", function () {
         var node2 = w.$('.aaa');
         var length = $('.a').length;
-        w.$('.a').after(node2);
+         w.$('.a').after(node2);
 
          expect($('.a').length).toBe(length * 2);
     });

@@ -190,20 +190,27 @@ var w = {};
         after: function () {
             var arg = arguments[0];
             if (arg instanceof Element) {
-
-                this.each(function (target, b) {
-                    var afterNode = target.nextElementSibling;
-                    console.log(afterNode && afterNode.innerText)
+                 this.each(function (target, b) {
+                     var afterNode = target.nextElementSibling;
                     if (!afterNode) {
                         arg.each(function (ele) {
-                            target.parentNode.appendChild(b === 0 ? ele : ele.cloneNode(true));
+                            var ele = ele.cloneNode(true)
+                            if(b === 0){
+                                console.log(ele)
+                                $(ele).remove();
+                            }
+                            target.parentNode.appendChild( ele  );
                         })
                     }
                     else {
                         // console.log(afterNode.innerText);
                         //todo copy 前
                         arg.each(function (ele) {
-                            afterNode.parentNode.insertBefore(b === 0 ? ele : ele.cloneNode(true), afterNode);
+                            var ele = ele.cloneNode(true)
+                            if(b === 0){
+                                $(ele).remove();
+                            }
+                            afterNode.parentNode.insertBefore(ele, afterNode);
                         })
                     }
 
