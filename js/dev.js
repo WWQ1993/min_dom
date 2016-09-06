@@ -9,30 +9,31 @@ var w = {};
 
 !function (domain) {
     domain.$ = function () {
-        if (arguments.length === 0)
+        var arg = arguments;
+        if (arg.length === 0)
             return null;
-        if (typeof arguments[0] === 'string') {
-            if (arguments[0].indexOf('<') > -1) {
+        if (typeof arg[0] === 'string') {
+            if (arg[0].indexOf('<') > -1) {
                 var ele = document.createElement('div'),
                     par = document.createElement('div'),
                     fragment = document.createDocumentFragment();
                 fragment.appendChild(par);
                 document.body.appendChild(ele);
-                console.log(arguments[0])
-                ele.outerHTML = arguments[0];
+                console.log(arg[0])
+                ele.outerHTML = arg[0];
                 return new Element([ele]);
             } else {
-                return new Element(document.querySelectorAll(arguments[0]));
+                return new Element(document.querySelectorAll(arg[0]));
             }
         }
-        if (arguments[0] instanceof HTMLElement || arguments[0] === window || arguments[0] === document) {
-            return new Element([arguments[0]]);
+        if (arg[0] instanceof HTMLElement || arg[0] === window || arg[0] === document) {
+            return new Element([arg[0]]);
         }
-        if (typeof arguments[0] === 'function') {
+        if (typeof arg[0] === 'function') {
             if (document.readyState != 'loading') {
-                arguments[0]();
+                arg[0]();
             } else {
-                document.addEventListener('DOMContentLoaded', arguments[0]);
+                document.addEventListener('DOMContentLoaded', arg[0]);
             }
         }
     };
@@ -51,7 +52,7 @@ var w = {};
         constructor: Element,
         //dom
         attr: function (attrName, attrContent) {
-            if (arguments.length <= 1)
+            if (!attrContent)
                 return this[0].getAttribute(attrName);
             else {
                 this.each(function () {
@@ -60,15 +61,11 @@ var w = {};
                 });
             }
         },
-        eq: function () {
-            if (arguments.length < 1)
-                return null;
-            else {
-                return new Element([this[arguments[0]]]);
-            }
+        eq: function (n) {
+            return new Element([this[n]]);
         },
-        text: function () {
-            if (arguments.length < 1) {
+        text: function (content) {
+            if (!content) {
                 var str = '';
                 this.each(function () {
 
@@ -77,29 +74,26 @@ var w = {};
                 return str;
             }
             else {
-                var arg = arguments;
                 this.each(function () {
-                    this.textContent = arg[0].toString()
+                    this.textContent = content.toString();
                 });
                 return this;
             }
         },
-        html: function () {
-            if (arguments.length < 1)
+        html: function (content) {
+            if (!content)
                 return this[0].innerHTML;
             else {
-                var arg = arguments;
                 this.each(function () {
-                    this.innerHTML = arg[0].toString()
+                    this.innerHTML = content.toString()
                 });
                 return this;
             }
         },
-        find: function () {
-            var arg = arguments,
-                arr = [];
+        find: function (str) {
+            var arr = [];
             this.each(function () {
-                var list = this.querySelectorAll(arg[0]),
+                var list = this.querySelectorAll(str),
                     listLength = list.length;
                 for (var i = 0; i < listLength; i++) {
                     arr.push(list[i]);
@@ -107,15 +101,15 @@ var w = {};
             });
             return new Element(arr);
         },
-        index: function () {
-            if (arguments.length === 0) {
+        index: function (arg) {
+            if (!arg) {
                 var nodeList = this[0].parentNode.children,
                     arr = Array.prototype.slice.call(nodeList, 0);
                 return arr.indexOf(this[0]);
-            } else if (typeof arguments[0] === 'string') {
-                return Array.prototype.slice.call(this, 0).indexOf(document.querySelectorAll(arguments[0])[0]);
+            } else if (typeof arg === 'string') {
+                return Array.prototype.slice.call(this, 0).indexOf(document.querySelectorAll(arg)[0]);
             } else {
-                var ele = arguments[0] instanceof HTMLElement ? arguments[0] : arguments[0][0];
+                var ele = arg instanceof HTMLElement ? arg : arg[0];
                 return Array.prototype.slice.call(this, 0).indexOf(ele);
 
             }
@@ -131,14 +125,14 @@ var w = {};
 
             return new Element(nodeList);
         },
-        parents: function () {
+        parents: function (str) {
             var arr = [],
                 node = this[0],
-                match = typeof arguments[0] === "string",
+                match = typeof str === "string",
                 nodes = null,
                 nodesLength = 0;
             if (match) {
-                nodes = domain.$(arguments[0]);
+                nodes = domain.$(str);
                 nodesLength = nodes.length
             }
             while (node !== document.body.parentNode) {//不是html元素则重复上溯
@@ -163,9 +157,9 @@ var w = {};
         append: function () {
 
         },
-        is: function () {
-            if (typeof arguments[0] === 'string') {
-                var sel = arguments[0];
+        is: function (str) {
+            if (typeof str === 'string') {
+                var sel = str;
                 var matches = function (el, selector) {
                         return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
                     },
@@ -182,16 +176,15 @@ var w = {};
                 throw new Error('please pass a string as parameter')
             }
         },
-        remove: function () {
-            if (arguments.length < 1) {
+        remove: function (str) {
+            if (!str) {
                 this.each(function () {
                     this.parentNode.removeChild(this);
                 })
             }
-            else if (typeof arguments[0] === 'string') {
-                var sel = arguments[0];
+            else if (typeof str === 'string') {
                 this.each(function () {
-                    if (domain.$(this).is(sel)) {
+                    if (domain.$(this).is(str)) {
                         domain.$(this).remove();
                     }
                 })
@@ -201,8 +194,7 @@ var w = {};
         clone: function () {
             return new Element([this[0].cloneNode(true)]);
         },
-        after: function () {
-            var arg = arguments[0];
+        after: function (arg) {
             if (Object.prototype.toString.call(arg) === "[object Object]" && arg[0] instanceof HTMLElement) {
                 arg.remove();
                 this.each(function (target, b) {
@@ -237,8 +229,7 @@ var w = {};
             }
             return this;
         },
-        before: function () {
-            var arg = arguments[0];
+        before: function (arg) {
             if (Object.prototype.toString.call(arg) === "[object Object]" && arg[0] instanceof HTMLElement) {
                 arg.remove();
                 this.each(function (target, b) {
@@ -262,8 +253,7 @@ var w = {};
         },
 
         //Style
-        addClass: function () {
-            var className = arguments[0];
+        addClass: function (className) {
             this.each(function () {
                 if (this.classList)
                     this.classList.add(className);
@@ -273,8 +263,7 @@ var w = {};
 
         },
 
-        removeClass: function () {
-            var className = arguments[0];
+        removeClass: function (className) {
             this.each(function () {
                 if (this.classList)
                     this.classList.remove(className);
@@ -282,8 +271,7 @@ var w = {};
                     this.className = this.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
             });
         },
-        toggleClass: function () {
-            var className = arguments[0];
+        toggleClass: function (className) {
             this.each(function () {
                 if (this.classList) {
                     this.classList.toggle(className);
@@ -300,82 +288,81 @@ var w = {};
                 }
             });
         },
-        css: function () {
-            if (arguments.length === 1 && typeof arguments[0] !== 'object')
-                return getComputedStyle(this[0])[arguments[0]];
+        css: function (arg, arg2) {
+            if (arg && typeof arg !== 'object')
+                return getComputedStyle(this[0])[arg];
             else {
-                var arg = arguments;
 
                 this.each(function (ele, i) {
-                    if (typeof arg[0] === 'object') {
-                        for (var attr in arg[0]) {
-                            this.style[attr] = arg[0][attr];
+                    if (typeof arg === 'object') {
+                        for (var attr in arg) {
+                            this.style[attr] = arg[attr];
                         }
                     }
                     else
-                        this.style[arg[0]] = arg[1];
+                        this.style[arg] = arg2;
                 });
                 return this;
             }
         },
         hide: function () {
-            this.each(function (ele, i) {
+            this.each(function () {
                 this.style.display = 'none';
             })
         },
         show: function () {
-            this.each(function (ele, i) {
+            this.each(function () {
                 this.style.display = '';
                 getComputedStyle(this).display === 'none' && (this.style.display = 'block');
             })
         },
-        fadeIn: function () {
-            var interval = arguments[0];
-            this.show();
-            this.each(function (el, i) {
-                el.style.opacity = 0;
-                var last = +new Date();
-                var tick = function () {
-                    el.style.opacity = +el.style.opacity + (new Date() - last) / interval;
-                    last = +new Date();
-                    if (+el.style.opacity < 1) {
-                        (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
-                    }
-                };
-                tick();
-            })
-        },
+        // fadeIn: function () {
+        //     var interval = arguments[0];
+        //     this.show();
+        //     this.each(function (el, i) {
+        //         el.style.opacity = 0;
+        //         var last = +new Date();
+        //         var tick = function () {
+        //             el.style.opacity = +el.style.opacity + (new Date() - last) / interval;
+        //             last = +new Date();
+        //             if (+el.style.opacity < 1) {
+        //                 (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+        //             }
+        //         };
+        //         tick();
+        //     })
+        // },
 
         //tools
-        each: function () {
+        each: function (f) {
             var length = this.length;
             for (var i = 0; i < length; i++) {
-                arguments[0].apply(this[i], [this[i], i]);
+                f.apply(this[i], [this[i], i]);
             }
         },
 
         //Event
-        on: function () {
-            if (typeof arguments[0] === 'object') {
+        on: function (arg0, arg1, arg2, arg3) {
+            if (typeof arg0 === 'object') {
                 var selector = '',
                     data = null;
                 switch (arguments.length) {
                     case 2:
-                        if (typeof arguments[1] === 'string') {
-                            selector = arguments[1];
+                        if (typeof arg1 === 'string') {
+                            selector = arg1;
                         }
                         else {
-                            data = arguments[1];
+                            data = arg1;
                         }
                         break;
                     case 3:
-                        selector = arguments[1];
-                        data = arguments[2];
+                        selector = arg1;
+                        data = arg2;
                         break;
                 }
 
-                for (var type in arguments[0]) {
-                    var handler = arguments[0][type];
+                for (var type in arg0) {
+                    var handler = arg0[type];
                     this.each(function (ele, i) {
                         bindEvent({
                             ele: ele,
@@ -389,27 +376,27 @@ var w = {};
                 return this;
             }
             else if (arguments.length > 1) {
-                var type = arguments[0],
+                var type = arg0,
                     selector = '',
                     data = '',
                     handler = null;
                 switch (arguments.length) {
                     case 2:
-                        handler = arguments[1];
+                        handler = arg1;
                         break;
                     case 3:
-                        if (typeof arguments[1] === 'string') {
-                            selector = arguments[1];
+                        if (typeof arg1 === 'string') {
+                            selector = arg1;
                         }
                         else {
-                            data = arguments[1];
+                            data = arg1;
                         }
-                        handler = arguments[2];
+                        handler = arg2;
                         break;
                     case 4:
-                        selector = arguments[1];
-                        data = arguments[2];
-                        handler = arguments[3];
+                        selector = arg1;
+                        data = arg2;
+                        handler = arg3;
                         break;
                 }
                 this.each(function (ele) {
@@ -424,8 +411,9 @@ var w = {};
                 return this;
             }
         },
-        off: function () {
-            if (arguments.length === 0) {
+        off: function (arg0) {
+            var arg = arguments;
+            if (!arg0) {
                 this.each(function (ele) {
                     for (var str in ele.event) {
                         var handlers = ele.event[str],
@@ -440,11 +428,10 @@ var w = {};
                 });
                 return this;
             }
-            else if (arguments.length === 1 && typeof arguments[0] === 'string') {
-                var arg = arguments;
+            else if (arg.length === 1 && typeof arg0 === 'string') {
                 this.each(function (ele) {
                     for (var str in ele.event) {
-                        if (str.indexOf(arg[0]) > -1) {
+                        if (str.indexOf(arg0) > -1) {
                             var handlers = ele.event[str],
                                 handlersLength = handlers.length;
                             for (var i = 0; i < handlersLength; i++) {
@@ -459,11 +446,10 @@ var w = {};
                 return this;
             }
             else {
-                var handler = arguments[arguments.length - 1],
-                    arg = arguments;
+                var handler = arg[arg.length - 1];
                 this.each(function (ele) {
                     for (var str in ele.event) {
-                        if (str.indexOf(arg[0]) > -1) {
+                        if (str.indexOf(arg0) > -1) {
                             var handlers = ele.event[str],
                                 handlersLength = handlers.length,
                                 newHandlers = [];
@@ -487,9 +473,9 @@ var w = {};
             }
 
         },
-        trigger: function () {
+        trigger: function (arg) {
             var event = document.createEvent('HTMLEvents');
-            event.initEvent(arguments[0], true, false);
+            event.initEvent(arg, true, false);
             this.each(function () {
                 this.dispatchEvent(event);
             });
@@ -522,29 +508,31 @@ var w = {};
 
     //static function
     domain.$.fn = Element.prototype;
-    domain.$.fn.extend = domain.$.extend = function () {
-        if (arguments.length === 1) {
-            if (typeof arguments[0] === 'object') {
+    domain.$.fn.extend = domain.$.extend = function (arg0) {
+        var arg = arguments
+        if (arg0) {
+            if (typeof arg0 === 'object') {
                 return this.extend(this, arguments[0]);
             }
         }
-        else if (typeof arguments[0] === 'boolean') {
-            if (arguments[0]) {
-                return deepCopy.apply(this, Array.prototype.slice.call(arguments, 1));
+        else if (typeof arg0 === 'boolean') {
+            if (arg0) {
+                return deepCopy.apply(this, Array.prototype.slice.call(arg, 1));
             }
             else {
-                return shallowCopy.apply(this, Array.prototype.slice.call(arguments, 1));
+                return shallowCopy.apply(this, Array.prototype.slice.call(arg, 1));
             }
         }
         else {
-            return shallowCopy.apply(this, arguments)
+            return shallowCopy.apply(this, arg)
         }
         var out = {};
 
         function shallowCopy() {
-            out = arguments[0];
-            for (var i = 1; i < arguments.length; i++) {
-                var obj = arguments[i];
+            var args = arguments
+            out = args[0];
+            for (var i = 1; i < args.length; i++) {
+                var obj = args[i];
 
                 if (!obj)
                     continue;
@@ -559,11 +547,11 @@ var w = {};
         }
 
         function deepCopy(out) {
+            var argd = arguments;
             out = out || {};
 
-            for (var i = 1; i < arguments.length; i++) {
-                var obj = arguments[i];
-
+            for (var i = 1; i < argd.length; i++) {
+                var obj = argd[i];
                 if (!obj)
                     continue;
 
