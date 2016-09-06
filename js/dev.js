@@ -14,13 +14,16 @@ var w = {};
         if (typeof arguments[0] === 'string') {
             return new Element(document.querySelectorAll(arguments[0]));
         }
-        if (arguments[0] instanceof HTMLElement) {
+        if (arguments[0] instanceof HTMLElement || arguments[0] === window || arguments[0] === document) {
             return new Element([arguments[0]]);
         }
         if (typeof arguments[0] === 'function') {
-            //todo after event done
+            if (document.readyState != 'loading') {
+                arguments[0]();
+            } else {
+                document.addEventListener('DOMContentLoaded', arguments[0]);
+            }
         }
-
     };
 
 
@@ -189,56 +192,60 @@ var w = {};
         },
         after: function () {
             var arg = arguments[0];
-            if (arg instanceof Element) {
-                 this.each(function (target, b) {
-                     var afterNode = target.nextElementSibling;
+            if (Object.prototype.toString.call(arg) === "[object Object]" && arg[0] instanceof HTMLElement) {
+                arg.remove();
+                this.each(function (target, b) {
+                    var afterNode = target.nextElementSibling;
                     if (!afterNode) {
                         arg.each(function (ele) {
-                            var ele = ele.cloneNode(true)
-                            if(b === 0){
-                                console.log(ele)
-                                $(ele).remove();
-                            }
-                            target.parentNode.appendChild( ele  );
+                            target.parentNode.appendChild(ele.cloneNode(true));
                         })
                     }
                     else {
-                        // console.log(afterNode.innerText);
-                        //todo copy 前
                         arg.each(function (ele) {
-                            var ele = ele.cloneNode(true)
-                            if(b === 0){
-                                $(ele).remove();
-                            }
-                            afterNode.parentNode.insertBefore(ele, afterNode);
+                            afterNode.parentNode.insertBefore(ele.cloneNode(true), afterNode);
                         })
                     }
-
-
                 })
             }
-            else if (arg instanceof HTMLElement) {//todo
-                this[0].parentNode.insertBefore(arg, this[0].nextElementSibling);
+            else if (arg instanceof HTMLElement) {
+                arg.parentNode.removeChild(arg);
+                this.each(function (target) {
+                    if (!target.nextElementSibling) {
+                        target.parentNode.appendChild(arg.cloneNode(true));
+                    }
+                    else {
+                        target.parentNode.insertBefore(arg.cloneNode(true), target.nextElementSibling);
+                    }
+                });
             }
             else if (typeof arg === 'string') {
-                this[0].insertAdjacentHTML('afterend', arg);
+                this.each(function (target) {
+                    target.insertAdjacentHTML('afterend', arg);
+                });
             }
             return this;
         },
         before: function () {
             var arg = arguments[0];
-            if (arg instanceof Element) {
-                var that = this;
-                var targetNode = that[0];
-                arg.each(function () {
-                    that[0].parentNode.insertBefore(this, targetNode);
+            if (Object.prototype.toString.call(arg) === "[object Object]" && arg[0] instanceof HTMLElement) {
+                arg.remove();
+                this.each(function (target, b) {
+                    arg.each(function (ele) {
+                        target.parentNode.insertBefore(ele.cloneNode(true), target);
+                    })
                 })
             }
             else if (arg instanceof HTMLElement) {
-                this[0].parentNode.insertBefore(arg, this[0]);
+                arg.parentNode.removeChild(arg);
+                this.each(function (target) {
+                    target.parentNode.insertBefore(arg.cloneNode(true), target);
+                });
             }
             else if (typeof arg === 'string') {
-                this[0].insertAdjacentHTML('afterend', arg);
+                this.each(function (target) {
+                    target.insertAdjacentHTML('beforebegin', arg);
+                });
             }
             return this;
         },
@@ -337,11 +344,170 @@ var w = {};
         },
 
         //Event
-        bind: function () {
+        on: function () {
+            if (typeof arguments[0] === 'object') {
+                var selector = '',
+                    data = null;
+                switch (arguments.length) {
+                    case 2:
+                        if (typeof arguments[1] === 'string') {
+                            selector = arguments[1];
+                        }
+                        else {
+                            data = arguments[1];
+                        }
+                        break;
+                    case 3:
+                        selector = arguments[1];
+                        data = arguments[2];
+                        break;
+                }
+
+                for (var type in arguments[0]) {
+                    var handler = arguments[0][type];
+                    this.each(function (ele, i) {
+                        bindEvent({
+                            ele: ele,
+                            type: type,
+                            handler: handler,
+                            data: data,
+                            selector: selector
+                        });
+                    })
+                }
+                return this;
+            }
+            else if (arguments.length > 1) {
+                var type = arguments[0],
+                    selector = '',
+                    data = '',
+                    handler = null;
+                switch (arguments.length) {
+                    case 2:
+                        handler = arguments[1];
+                        break;
+                    case 3:
+                        if (typeof arguments[1] === 'string') {
+                            selector = arguments[1];
+                        }
+                        else {
+                            data = arguments[1];
+                        }
+                        handler = arguments[2];
+                        break;
+                    case 4:
+                        selector = arguments[1];
+                        data = arguments[2];
+                        handler = arguments[3];
+                        break;
+                }
+                this.each(function (ele) {
+                    bindEvent({
+                        ele: ele,
+                        type: type,
+                        handler: handler,
+                        data: data,
+                        selector: selector
+                    });
+                });
+                return this;
+            }
+        },
+        off: function () {
+            if (arguments.length === 0) {
+                this.each(function (ele) {
+                    for (var str in ele.event) {
+                        var handlers = ele.event[str],
+                            handlersLength = handlers.length;
+                        for (var i = 0; i < handlersLength; i++) {
+                            var obj = handlers[i],
+                                originHandler = obj['originHandler'];
+                            ele.removeEventListener(str.split('.')[0], originHandler);
+                        }
+                        ele.event[str] = [];
+                    }
+                });
+                return this;
+            }
+            else if (arguments.length === 1 && typeof arguments[0] === 'string') {
+                var arg = arguments;
+                this.each(function (ele) {
+                    for (var str in ele.event) {
+                        if (str.indexOf(arg[0]) > -1) {
+                            var handlers = ele.event[str],
+                                handlersLength = handlers.length;
+                            for (var i = 0; i < handlersLength; i++) {
+                                var obj = handlers[i],
+                                    originHandler = obj['originHandler'];
+                                ele.removeEventListener(str.split('.')[0], originHandler);
+                            }
+                            ele.event[str] = [];
+                        }
+                    }
+                });
+                return this;
+            }
+            else {
+                var handler = arguments[arguments.length - 1],
+                    arg = arguments;
+                this.each(function (ele) {
+                    for (var str in ele.event) {
+                        if (str.indexOf(arg[0]) > -1) {
+                            var handlers = ele.event[str],
+                                handlersLength = handlers.length,
+                                newHandlers = [];
+                            for (var i = 0; i < handlersLength; i++) {
+                                var obj = handlers[i],
+                                    originHandler = obj['originHandler'],
+                                    $handler = obj['$handler'];
+
+                                if (handler === $handler) {
+                                    ele.removeEventListener(str.split('.')[0], originHandler);
+                                }
+                                else {
+                                    newHandlers.push(obj)
+                                }
+                            }
+                            ele.event[str] = newHandlers;
+                        }
+                    }
+                });
+                return this;
+            }
+
+        },
+        trigger: function () {
+            var event = document.createEvent('HTMLEvents');
+            event.initEvent(arguments[0], true, false);
+            this.each(function () {
+                this.dispatchEvent(event);
+            });
         }
         //ajax
     };
 
+    function bindEvent(obj) {
+        function originHandler(e) {
+            e.data = obj.data;
+
+            if (obj.selector) {
+                if ($(obj.ele).find(obj.selector).index(e.srcElement) > -1) {
+                    obj.handler(e);
+                }
+            }
+            else {
+                obj.handler(e);
+            }
+        }
+
+        obj.ele.addEventListener(obj.type.split('.')[0], originHandler);
+        obj.ele.event = obj.ele.event || {};
+        obj.ele.event[obj.type] = obj.ele.event[obj.type] || [];
+        obj.ele.event[obj.type].push({
+            originHandler: originHandler,
+            $handler: obj.handler
+        })
+    }
 
     //static function
     domain.$.fn = Element.prototype;
@@ -392,7 +558,6 @@ var w = {};
 
                 for (var key in obj) {
                     if (obj.hasOwnProperty(key)) {
-                        // console.log(key)
                         if (typeof obj[key] === 'object')
                             out[key] = deepCopy(out[key], obj[key]);
                         else

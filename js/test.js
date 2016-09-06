@@ -52,10 +52,31 @@ describe("DOM_operation", function () {
     it("clone", function () {
         var node2 = w.$('.aaa');
         var length = $('.a').length;
-         w.$('.a').after(node2);
+        w.$('.a').before(node2);
 
-         expect($('.a').length).toBe(length * 2);
+       expect($('.a').length).toBe(length  );
     });
 });
 
-// w.$('.bb').after(w.$('.aaa'));
+// w.$('.on').on({
+//     'click.on': function (e) {
+//         console.log(e)
+//     },
+//     'mouseover.a':function (e) {
+//         console.log('on')
+//     }
+// }, '', 'dsf');
+function cc(e) {
+    console.log('cc')
+};
+w.$('.on').on('cclick.on',{a:132},cc);
+w.$('.on').on('click.on',{a:132},function (e) {
+    console.log('234234')
+});
+w.$('.on').trigger('cclick')
+
+w.$(function () {
+})
+
+// w.$('.on').off('click.bb',cc);
+// w.$('.on').off('mouseover.a');
