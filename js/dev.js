@@ -12,7 +12,18 @@ var w = {};
         if (arguments.length === 0)
             return null;
         if (typeof arguments[0] === 'string') {
-            return new Element(document.querySelectorAll(arguments[0]));
+            if (arguments[0].indexOf('<') > -1) {
+                var ele = document.createElement('div'),
+                    par = document.createElement('div'),
+                    fragment = document.createDocumentFragment();
+                fragment.appendChild(par);
+                document.body.appendChild(ele);
+                console.log(arguments[0])
+                ele.outerHTML = arguments[0];
+                return new Element([ele]);
+            } else {
+                return new Element(document.querySelectorAll(arguments[0]));
+            }
         }
         if (arguments[0] instanceof HTMLElement || arguments[0] === window || arguments[0] === document) {
             return new Element([arguments[0]]);

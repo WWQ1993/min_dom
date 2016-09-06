@@ -80,3 +80,7 @@ w.$(function () {
 
 // w.$('.on').off('click.bb',cc);
 // w.$('.on').off('mouseover.a');
+w.$('.on')[0].outerHTML='<p>234234234234234234</p>'
+console.log(w.$('<input type="text"/>'))
+w.$('.on').after(w.$('<input type="text"/>'));
+//
