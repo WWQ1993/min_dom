@@ -13,15 +13,8 @@ var w = {};
         if (arg.length === 0)
             return null;
         if (typeof arg[0] === 'string') {
-            if (arg[0].indexOf('<') > -1) {
-                var ele = document.createElement('div'),
-                    par = document.createElement('div'),
-                    fragment = document.createDocumentFragment();
-                fragment.appendChild(par);
-                document.body.appendChild(ele);
-                console.log(arg[0])
-                ele.outerHTML = arg[0];
-                return new Element([ele]);
+            if (arg[0].indexOf('<') > -1) { //html字符串
+                return new Element([parseStringToHTML(arg[0])]);
             } else {
                 return new Element(document.querySelectorAll(arg[0]));
             }
@@ -37,7 +30,6 @@ var w = {};
             }
         }
     };
-
 
     function Element(nodeList) {
         var length = 0;
@@ -177,17 +169,21 @@ var w = {};
             }
         },
         remove: function (str) {
-            if (!str) {
-                this.each(function () {
-                    this.parentNode.removeChild(this);
-                })
+            try {
+                if (!str) {
+                    this.each(function () {
+                        this.parentNode.removeChild(this);
+                    })
+                }
+                else if (typeof str === 'string') {
+                    this.each(function () {
+                        if (domain.$(this).is(str)) {
+                            domain.$(this).remove();
+                        }
+                    })
+                }
             }
-            else if (typeof str === 'string') {
-                this.each(function () {
-                    if (domain.$(this).is(str)) {
-                        domain.$(this).remove();
-                    }
-                })
+            catch (e) {
             }
             return this;
         },
@@ -195,7 +191,7 @@ var w = {};
             return new Element([this[0].cloneNode(true)]);
         },
         after: function (arg) {
-            if (Object.prototype.toString.call(arg) === "[object Object]" && arg[0] instanceof HTMLElement) {
+            if (arg instanceof Element) {
                 arg.remove();
                 this.each(function (target, b) {
                     var afterNode = target.nextElementSibling;
@@ -230,7 +226,7 @@ var w = {};
             return this;
         },
         before: function (arg) {
-            if (Object.prototype.toString.call(arg) === "[object Object]" && arg[0] instanceof HTMLElement) {
+            if (arg instanceof Element) {
                 arg.remove();
                 this.each(function (target, b) {
                     arg.each(function (ele) {
@@ -504,6 +500,13 @@ var w = {};
             originHandler: originHandler,
             $handler: obj.handler
         })
+    }
+    function parseStringToHTML(text) {
+        var i, a = document.createElement("div"),
+            b = document.createDocumentFragment();
+        a.innerHTML = text;
+        while (i = a.firstChild) b.appendChild(i);
+        return b;
     }
 
     //static function

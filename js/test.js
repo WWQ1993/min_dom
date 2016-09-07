@@ -65,6 +65,7 @@ describe("DOM_operation", function () {
 //     'mouseover.a':function (e) {
 //         console.log('on')
 //     }
+
 // }, '', 'dsf');
 function cc(e) {
     console.log('cc')
@@ -80,7 +81,6 @@ w.$(function () {
 
 // w.$('.on').off('click.bb',cc);
 // w.$('.on').off('mouseover.a');
-w.$('.on')[0].outerHTML='<p>234234234234234234</p>'
+  w.$('.on').before(w.$('<input type="text"/>'));
 console.log(w.$('<input type="text"/>'))
-w.$('.on').after(w.$('<input type="text"/>'));
-//
+document.body.appendChild(w.$('<input type="text"/>')[0])
