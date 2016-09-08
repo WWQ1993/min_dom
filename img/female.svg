@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="15px" height="15px" viewBox="0 0 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 4</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="b-and-c" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-102.000000, -283.000000)">
+            <g id="Group-4" transform="translate(102.000000, 283.000000)">
+                <g id="ic_gender_girl">
+                    <path d="M7.5,15 C11.6421356,15 15,11.6421356 15,7.5 C15,3.35786438 11.6421356,0 7.5,0 C3.35786438,0 0,3.35786438 0,7.5 C0,11.6421356 3.35786438,15 7.5,15 Z" id="Oval-145" fill="#FF759E" fill-rule="evenodd"></path>
+                    <circle id="Oval-146" stroke="#FFFFFF" stroke-width="1" cx="7.5" cy="5.73529412" r="3.08823529"></circle>
+                    <path d="M5.73529412,11.0294118 L9.26470588,11.0294118" id="Line" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round"></path>
+                    <path d="M7.5,12.7941176 L7.5,9.26470588" id="Line" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

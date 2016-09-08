@@ -54,7 +54,15 @@ describe("DOM_operation", function () {
         var length = $('.a').length;
         w.$('.a').before(node2);
 
-       expect($('.a').length).toBe(length  );
+        expect($('.a').length).toBe(length);
+    });
+    it('scrollTop、scrollLeft', function () {
+        var top1 = $('body').scrollTop();
+        var top2 = w.$('body').scrollTop();
+        var left1 = $('body').scrollLeft();
+        var left2 = w.$('body').scrollLeft();
+        expect(top1).toBe(top2);
+        expect(left1).toBe(left2);
     });
 });
 
@@ -68,19 +76,88 @@ describe("DOM_operation", function () {
 
 // }, '', 'dsf');
 function cc(e) {
-    console.log('cc')
 };
-w.$('.on').on('cclick.on',{a:132},cc);
-w.$('.on').on('click.on',{a:132},function (e) {
+w.$('.on').on('cclick.on', {a: 132}, cc);
+w.$('.on').on('click.on', {a: 132}, function (e) {
     console.log('234234')
 });
-w.$('.on').trigger('cclick')
+w.$('.on').trigger('click')
 
 w.$(function () {
 })
 
 // w.$('.on').off('click.bb',cc);
 // w.$('.on').off('mouseover.a');
-  w.$('.on').before(w.$('<input type="text"/>'));
-console.log(w.$('<input type="text"/>'))
-document.body.appendChild(w.$('<input type="text"/>')[0])
+w.$('.on').before(w.$('<input type="text"/>'));
+// console.log(w.$('<input type="text"/>'))
+document.body.appendChild(w.$('<input type="text"/>')[0]);
+$(window).on('clickk', function () {
+    w.$.ajax({
+        dataType: 'json',
+        type: 'GET',
+        data: 'industry=electronic&cityId=435&page=1&size=3',
+        url: 'http://op.chinahr.com/2016spring/api/getIndustryListByPage',
+        success: function (e) {
+            console.log(e)
+        },
+        timeout: 10,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            'Cache-Control': 'cache'
+        },
+        error: function (xhr, type, err) {
+            console.log(arguments)
+
+        }
+        ,
+        beforeSend: function () {
+            console.log(arguments)
+        }
+    });
+
+    //http://cache.video.iqiyi.com/jp/avlist/202861101/1/
+    //http://qzone-music.qq.com/fcg-bin/fcg_music_fav_getinfo.fcg?dirinfo=0&dirid=1&uin=QQ%E5%8F%B7&p=0.519638272547262&g_tk=128423485
+    w.$.ajax({
+        dataType: 'jsonp',
+        url: 'http://cache.video.iqiyi.com/jp/avlist/202861101/1/',
+        type: 'GET',
+        jsonpCallback: 'callbackaaa',
+        timeout: 1000,
+        success: function (e) {
+            console.log(arguments)
+        },
+        complete: function (e) {
+            console.log(arguments)
+        },
+
+        error: function (xhr, type, err) {
+            console.log(arguments)
+
+        },
+        beforeSend: function () {
+            console.log(arguments)
+        }
+    });
+
+});
+w.$(window).click( function (e) {
+    console.log(e.data.a)
+});
+
+
+w.$(window).click();
+//
+// $.ajax({
+//     dataType:'json',
+//     type:'GET',
+//     url:'http://op.chinahr.com/2016spring/api/getIndustryListByPage?industry=electronic&cityId=435&page=1&size=3',
+//     success:function (e) {
+//         console.log(e)
+//     },
+//
+// })
+
+var obj = {name: 'tom', 'class': {className: 'class1', attr2: 'att'}, classMates: [{name: 'lily'}]};
+console.log((obj))
+console.log(w.$.param(obj))
+console.log(decodeURIComponent($.param(obj)))

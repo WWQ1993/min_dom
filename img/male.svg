@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="15px" height="15px" viewBox="0 0 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 39.1 (31720) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 3</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="b-and-c" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-82.000000, -283.000000)">
+            <g id="Group-3" transform="translate(82.000000, 283.000000)">
+                <g id="Group-2">
+                    <g id="ic_gender_boy">
+                        <path d="M7.5,15 C11.6421356,15 15,11.6421356 15,7.5 C15,3.35786438 11.6421356,0 7.5,0 C3.35786438,0 0,3.35786438 0,7.5 C0,11.6421356 3.35786438,15 7.5,15 Z" id="Oval-145" fill="#75B4FF"></path>
+                        <ellipse id="Oval-146" stroke="#FFFFFF" cx="5.73529412" cy="9.26470588" rx="3.08823529" ry="3.08823529"></ellipse>
+                        <path d="M7.94117647,3.52941176 L11.4705882,3.52941176" id="Line" stroke="#FFFFFF" stroke-linecap="round"></path>
+                        <path d="M11.0294118,3.97058824 L7.90982302,7.09017698" id="Line" stroke="#FFFFFF" stroke-linecap="round"></path>
+                        <path d="M11.4705882,7.05882353 L11.4705882,3.52941176" id="Line" stroke="#FFFFFF" stroke-linecap="round"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
