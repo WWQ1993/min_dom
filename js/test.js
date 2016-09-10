@@ -83,14 +83,13 @@ w.$('.on').on('click.on', {a: 132}, function (e) {
 });
 w.$('.on').trigger('click')
 
-w.$(function () {
-})
+console.log(w.$(function () {}))
 
 // w.$('.on').off('click.bb',cc);
 // w.$('.on').off('mouseover.a');
-w.$('.on').before(w.$('<input type="text"/>'));
+// w.$('.on').before(w.$('<input type="text"/>'));
 // console.log(w.$('<input type="text"/>'))
-document.body.appendChild(w.$('<input type="text"/>')[0]);
+document.body.appendChild(w.$('<div style="color:red;"><b>234</b><div>d</div></div>')[0]);
 $(window).on('clickk', function () {
     w.$.ajax({
         dataType: 'json',
@@ -160,4 +159,58 @@ w.$(window).click();
 var obj = {name: 'tom', 'class': {className: 'class1', attr2: 'att'}, classMates: [{name: 'lily'}]};
 console.log((obj))
 console.log(w.$.param(obj))
-console.log(decodeURIComponent($.param(obj)))
+console.log(decodeURIComponent($.param(obj)));
+
+$('.target').append($('.on'));
+
+console.log($('div').index($('.on')[1]));
+
+
+
+
+var obj = {
+    a: {a:1,b:[12,2]},
+    b: {
+        c: 12,
+        d: 3,
+    },
+    d: [1, {aa: 11}]
+};
+function param(target) {
+    var scope =[];
+
+    function inner(target) {
+        if(typeof target==='object'){
+            var result = '';
+            for (var name in target){
+
+                if(target.hasOwnProperty(name)){
+                    var nameC = typeof  (name) ==='number'?'':name;
+                    console.log(name)
+                    scope.push(nameC);
+                    result+= inner(target[name]);
+
+                }
+                mark = null;
+
+            }
+            scope.pop()
+            return result;
+        }
+        else{
+            var str = scope.join('][')
+            scope.pop()
+            return (str+']='+ target + '&').replace(/]/,'');
+        }
+    }
+
+    var str= inner(target) ;
+    return  str.substring(0,str.length-1);
+}
+
+
+describe("para", function () {
+    it("pa", function () {
+        expect(decodeURIComponent($.param(obj)) ).toBe(param(obj));
+    });
+});
