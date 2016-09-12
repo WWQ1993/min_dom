@@ -8,7 +8,7 @@
 
 <script>
     var obj = {
-        a: {a:1,b:[12,2]},
+        a: {a: 1, b: [12, 2]},
         b: {
             c: 12,
             d: 3,
@@ -16,16 +16,16 @@
         d: [1, {aa: 11}]
     }
     function param(target) {
-        var scope =[];
+        var scope = [];
 
         function inner(target) {
-            if(typeof target==='object'){
+            if (typeof target === 'object') {
                 var result = '';
-                for (var name in target){
+                for (var name in target) {
 
-                    if(target.hasOwnProperty(name)){
+                    if (target.hasOwnProperty(name)) {
                         scope.push(name);
-                        result+= inner(target[name]);
+                        result += inner(target[name]);
 
                     }
                     mark = null;
@@ -34,18 +34,18 @@
                 scope.pop()
                 return result;
             }
-            else{
+            else {
                 var str = scope.join('][')
                 scope.pop()
-                return (str+']='+ target + '&').replace(/]/,'');
+                return (str + ']=' + target + '&').replace(/]/, '');
             }
         }
 
-       var str= inner(target) ;
-        return str.substring(0,str.length-1);
+        var str = inner(target);
+        return str.substring(0, str.length - 1);
     }
 
-   document.write(param(obj));
+    document.write(param(obj));
 
 </script>
 </body>

@@ -67,7 +67,7 @@
         };
         this.catch = function (f) {
             that.fail_callBack = f;
-        }
+        };
 
         setTimeout(function () {
             f(suc, fail);
@@ -94,36 +94,87 @@
         console.log('siba:' + e)
     });
 
+    Promise.all = function (arr) {
+        if (!arr instanceof Array) return;
+        var counter = 0,
+                total = arr.length,
+                i = 0,
+                result = [],
+                callback = function () {
 
-    // 0.5秒后返回input*input的计算结果:
-    function multiply(input) {
-        return new Promise(function (resolve, reject) {
-            console.log('calculating ' + input + ' x ' + input + '...');
-            setTimeout(resolve, 500, input * input);
-        });
-    }
+                },
+                failCb = function () {
 
-    // 0.5秒后返回input+input的计算结果:
-    function add(input) {
-        return new Promise(function (resolve, reject) {
-            console.log('calculating ' + input + ' + ' + input + '...');
-            setTimeout(resolve, 500, input + input);
-        });
-    }
+                };
 
-    new Promise(function (resolve, reject) {
-        console.log('start new Promise...');
-        resolve(123);
-    })
-            .then(multiply)
-            .then(add)
-            .then(multiply)
-            .then(add)
-            .then(function (result) {
-                console.log('Got value: ' + result);
+        for (; i < total; i++) {
+
+            arr[i].then(function (e) {
+                counter++;
+                result.push(e);
+                if (counter === total) {
+                    callback(result);
+                }
             }).catch(function (e) {
-        console.error('err:' + e);
-    })
+                failCb(e);
+            })
+        }
+        return {
+            then: function (cb) {
+                callback = cb;
+                return this;
+            }, catch: function (cb) {
+                failCb = cb;
+            }
+        }
+    };
+    Promise.resolve = function (f) {
+        
+    }
+
+    var p1 = new Promise(function (resolve, reject) {
+        setTimeout(resolve, 500, 'P1');
+    });
+    var p2 = new Promise(function (resolve, reject) {
+        setTimeout(reject, 600, 'P2');
+    });
+    // 同时执行p1和p2，并在它们都完成后执行then:
+    Promise.all([p1, p2]).then(function (results) {
+        console.log(results); // 获得一个Array: ['P1', 'P2']
+    }).catch(function () {
+        console.log('ff')
+    });
+
+
+    //    // 0.5秒后返回input*input的计算结果:
+    //    function multiply(input) {
+    //        return new Promise(function (resolve, reject) {
+    //            console.log('calculating ' + input + ' x ' + input + '...');
+    //            setTimeout(resolve, 500, input * input);
+    //        });
+    //    }
+    //
+    //    // 0.5秒后返回input+input的计算结果:
+    //    function add(input) {
+    //        return new Promise(function (resolve, reject) {
+    //            console.log('calculating ' + input + ' + ' + input + '...');
+    //            setTimeout(resolve, 500, input + input);
+    //        });
+    //    }
+    //
+    //    new Promise(function (resolve, reject) {
+    //        console.log('start new Promise...');
+    //        resolve(123);
+    //    })
+    //            .then(multiply)
+    //            .then(add)
+    //            .then(multiply)
+    //            .then(add)
+    //            .then(function (result) {
+    //                console.log('Got value: ' + result);
+    //            }).catch(function (e) {
+    //        console.error('err:' + e);
+    //    })
 
 
 </script>

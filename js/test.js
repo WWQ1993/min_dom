@@ -76,12 +76,13 @@ describe("DOM_operation", function () {
 
 // }, '', 'dsf');
 function cc(e) {
+    console.log(e)
 };
-w.$('.on').on('cclick.on', {a: 132}, cc);
-w.$('.on').on('click.on', {a: 132}, function (e) {
-    console.log('234234')
-});
-w.$('.on').trigger('click')
+$('div').on('click.on','.on', {a: 132}, cc);
+// w.$('.on').on('click.on', {a: 132}, function (e) {
+//     console.log('234234')
+// });
+// w.$('.on').trigger('click')
 
 console.log(w.$(function () {}))
 
@@ -169,48 +170,21 @@ console.log($('div').index($('.on')[1]));
 
 
 var obj = {
-    a: {a:1,b:[12,2]},
+    a: {a:1,b:[[22,33],2]},
     b: {
-        c: 12,
+        c: '为地方',
         d: 3,
     },
     d: [1, {aa: 11}]
 };
-function param(target) {
-    var scope =[];
-
-    function inner(target) {
-        if(typeof target==='object'){
-            var result = '';
-            for (var name in target){
-
-                if(target.hasOwnProperty(name)){
-                    var nameC = typeof  (name) ==='number'?'':name;
-                    console.log(name)
-                    scope.push(nameC);
-                    result+= inner(target[name]);
-
-                }
-                mark = null;
-
-            }
-            scope.pop()
-            return result;
-        }
-        else{
-            var str = scope.join('][')
-            scope.pop()
-            return (str+']='+ target + '&').replace(/]/,'');
-        }
-    }
-
-    var str= inner(target) ;
-    return  str.substring(0,str.length-1);
-}
 
 
 describe("para", function () {
     it("pa", function () {
-        expect(decodeURIComponent($.param(obj)) ).toBe(param(obj));
+        expect(decodeURIComponent($.param(obj)) ).toBe(w.$.param(obj));
     });
+});
+
+w.$.ajax({
+    data:obj
 });

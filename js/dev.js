@@ -386,13 +386,13 @@ var w = {};
 
         //Event
         on: function (arg0, arg1, arg2, arg3) {
-            if (typeof arg0 === 'object') {
+            if (typeof arg0 === 'object') { //绑定对象中的所有事件
                 var selector = '',
                     data = null;
                 switch (arguments.length) {
                     case 2:
-                        if (typeof arg1 === 'string') selector = arg1;
-                        else data = arg1;
+                        if (typeof arg1 === 'string') selector = arg1;  //传入选择器
+                        else data = arg1;   //传入data
                         break;
                     case 3:
                         selector = arg1;
@@ -401,7 +401,7 @@ var w = {};
                 }
 
                 for (var type in arg0) {
-                    var handler = arg0[type];
+                    var handler = arg0[type];   //回调函数
                     this.each(function (ele, i) {
                         bindEvent({
                             ele: ele,
@@ -444,7 +444,7 @@ var w = {};
                     });
                 });
                 return this;
-            }
+            };
         },
         off: function (arg0) {
             var arg = arguments;
@@ -515,15 +515,26 @@ var w = {};
                 this.dispatchEvent(event);
             });
         },
+        one:function () {
+            
+        }
 
     };
 
 
     function bindEvent(obj) {
+        
+        obj.ele.addEventListener(obj.type.split('.')[0], originHandler);
+        obj.ele.event = obj.ele.event || {};
+        obj.ele.event[obj.type] = obj.ele.event[obj.type] || [];
+        obj.ele.event[obj.type].push({
+            originHandler: originHandler,
+            $handler: obj.handler
+        });
         function originHandler(e) {
             e.data = obj.data;
 
-            if (obj.selector) {
+            if (obj.selector) { //如果传入了选择器，则再绑定对象的子元素中选择符合的元素，执行回调。
                 if ($(obj.ele).find(obj.selector).index(e.srcElement) > -1) {
                     obj.handler(e);
                 }
@@ -533,13 +544,6 @@ var w = {};
             }
         }
 
-        obj.ele.addEventListener(obj.type.split('.')[0], originHandler);
-        obj.ele.event = obj.ele.event || {};
-        obj.ele.event[obj.type] = obj.ele.event[obj.type] || [];
-        obj.ele.event[obj.type].push({
-            originHandler: originHandler,
-            $handler: obj.handler
-        })
     }
 
     function string2Dom(text) {
@@ -548,6 +552,30 @@ var w = {};
         return a.firstChild;
     }
 
+    //设置原生事件
+    !function (obj, arr) {
+
+        function addFunction(type) {
+            obj[type] = function (arg, arg1) {
+                if (!arg) {
+                    this.trigger(type);
+                    return this;
+                }
+                if (typeof arg === 'function') {
+                    this.on(type, arg);
+                    return this;
+                }
+                else {
+                    this.on(type, '', arg, arg1);
+                    return this;
+                }
+            }
+        }
+
+        for (var i = 0; i < arr.length; i++) {
+            addFunction(arr[i]);
+        }
+    }(Element.prototype, ['blur', 'focusin', 'mousedown', 'mouseup', 'change', 'focusout', 'mouseenter', 'resize', 'click', 'keydown', 'mouseleave', 'scroll', 'dbclick', 'keypress', 'mousemove', 'select', 'error', 'keyup', 'mouseout', 'submit', 'focus', 'load', 'mouseover', 'unload', 'tap', 'touchstart', 'touchmove', 'touchend'])
 
     //static function
     $.fn = Element.prototype;
@@ -589,7 +617,6 @@ var w = {};
                         else
                             out[key] = obj[key];
                     }
-
             }
             return out;
         }
@@ -623,31 +650,31 @@ var w = {};
 
         return elements
     };
-    $.param = function f(para) {    //todo
-        // if (typeof para === 'object') {
-        //     var str = '';
-        //     for (var name in para) {
-        //         var val = para[name]
-        //
-        //         if ($.isArray(val)) {
-        //             for (var i = 0; i < val.length; i++) {
-        //                 str += name + '[' + i + ']=' + f(val[i]);
-        //             }
-        //         }
-        //         else if (typeof val === 'object') {
-        //             str += name + '][' + f(val);
-        //         }
-        //         else {
-        //             str += name + ']' + f(val);
-        //         }
-        //         // console.log(str)
-        //     }
-        //     return str;
-        // }
-        // else {
-        //     return '=' + para
-        // }
-        return para
+    $.param = function (target) {
+        var scope = [];
+
+        function inner(target) {
+            if (typeof target === 'object') {
+                var result = '';
+                for (var name in target) {
+
+                    if (target.hasOwnProperty(name)) {
+                        scope.push(name);
+                        result += inner(target[name]);
+                    }
+                }
+                scope.pop();
+                return result;
+            }
+            else {
+                var str = scope.join('][');
+                scope.pop();
+                return (str + ']=' + target + '&').replace(/]/, '');
+            }
+        }
+
+        var str = inner(target);
+        return str.substring(0, str.length - 1);
     };
     //ajax
 
@@ -665,45 +692,47 @@ var w = {};
             complete = option.complete || nullFunction,
             async = option.async || true,
             headers = option.headers || '',
-            jsonp = option.jsonp || 'callback',
+            jsonp = option.jsonp || 'callback', //设置函数名的键名
             jsonpCallBackName = 'jsonp' + new Date().getTime(),
-            jsonpCallback = option.jsonpCallback || jsonpCallBackName
+            jsonpCallback = option.jsonpCallback || jsonpCallBackName;//函数名键值
 
 
-        if (dataType.toLocaleLowerCase() === 'jsonp') {
+        if (dataType.toLocaleLowerCase() === 'jsonp') {//jsonp
             var xhr = {},
-                timeoutId = setTimeout(function () {
+                timeoutId = setTimeout(function () {    //设置超时
                     delete window[jsonpCallback];
                     error(xhr, 'timeout', null);
                     complete(xhr, 'timeout');
                 }, timeout),
-                ofterExecJs = function (obj) {
+                ofterExecJs = function (obj) {//执行js后触发
                     clearTimeout(timeoutId);
                     document.getElementsByTagName("head")[0].removeChild(script);
                     delete window[jsonpCallback];
                     success(obj, 'success', xhr);
                     complete(obj, 'success');
                 };
-            window[jsonpCallback] = function (obj) {
+
+            window[jsonpCallback] = function (obj) {    //设置全局回调函数
                 ofterExecJs(obj);
             };
 
-            beforeSend(xhr);
+            beforeSend(xhr);    //调用beforeSend
 
+            //引用外部脚本
             var script = document.createElement("script");
             script.type = "text/javascript";
             script.src = url + (url.indexOf('?') < 0 ? '?' : '&') + jsonp + '=' + jsonpCallback;
             document.getElementsByTagName("head")[0].appendChild(script);
         }
-        else {
+        else {  //xhr
             var request = new XMLHttpRequest();
-            if (type === 'GET') {
+            if (type === 'GET') { //设置数据
                 url += '?' + data;
             }
             request.open(type, url, async);
 
             request.onload = function () {
-                if (request.status >= 200 && request.status < 400) {
+                if (request.status >= 200 && request.status < 400) {    //成功回调
                     // Success!
                     var data = null,
                         str = request.responseText
@@ -719,23 +748,23 @@ var w = {};
                             break;
                     }
                     success(data, request.status, request);
-                } else {
+                } else {    //网络正常的失败回调
                     error(request, 'error', request.statusText)
                 }
                 complete(request, request.status);
             };
 
-            request.onerror = function () { //offline error
+            request.onerror = function () { //网络错误
                 error(request, 'abort', null)
             };
 
-            if (typeof headers === 'object') {
+            if (typeof headers === 'object') {  //设置头部
                 for (var name in headers) {
                     var val = headers[name];
                     request.setRequestHeader(name, val);
                 }
             }
-            beforeSend(request);
+            beforeSend(request);    //调用beforeSend
 
             request.send(data);
 
@@ -748,30 +777,6 @@ var w = {};
             }
         }
     };
-
-    !function (obj, arr) {
-
-        function addFunction(type) {
-            obj[type] = function (arg, arg1) {
-                if (!arg) {
-                    this.trigger(type);
-                    return this;
-                }
-                if (typeof arg === 'function') {
-                    this.on(type, arg);
-                    return this;
-                }
-                else {
-                    this.on(type, '', arg, arg1);
-                    return this;
-                }
-            }
-        }
-
-        for (var i = 0; i < arr.length; i++) {
-            addFunction(arr[i]);
-        }
-    }(Element.prototype, ['blur', 'focusin', 'mousedown', 'mouseup', 'change', 'focusout', 'mouseenter', 'resize', 'click', 'keydown', 'mouseleave', 'scroll', 'dbclick', 'keypress', 'mousemove', 'select', 'error', 'keyup', 'mouseout', 'submit', 'focus', 'load', 'mouseover', 'unload', 'tap', 'touchstart', 'touchmove', 'touchend'])
 
 
 }(w);
