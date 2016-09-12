@@ -318,8 +318,8 @@ var w = {};
                 if (this.classList) {
                     this.classList.toggle(className);
                 } else {
-                    var classes = this.className.split(' ');
-                    var existingIndex = classes.indexOf(className);
+                    var classes = this.className.split(' '),
+                        existingIndex = classes.indexOf(className);
 
                     if (existingIndex >= 0)
                         classes.splice(existingIndex, 1);

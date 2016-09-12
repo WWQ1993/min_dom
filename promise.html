@@ -6,77 +6,82 @@
 </head>
 <body>
 <script>
-    {   //promise 0
-        function ajax() {
-            var succ_f = null,
-                    fail_f = null,
-                    obj = {
-                        success: function (callback) {
-                            succ_f = callback;
-                        },
-                        fail: function (callback) {
-                            fail_f = callback;
-                        }
-                    };
-            setTimeout(function () {
-                var num = Math.random()
-                if (num < .5) {
+    //    {   //promise 0
+    //        function ajax() {
+    //            var succ_f = null,
+    //                    fail_f = null,
+    //                    obj = {
+    //                        success: function (callback) {
+    //                            succ_f = callback;
+    //                        },
+    //                        fail: function (callback) {
+    //                            fail_f = callback;
+    //                        }
+    //                    };
+    //            setTimeout(function () {
+    //                var num = Math.random()
+    //                if (num < .5) {
+    //
+    //                    succ_f && succ_f();
+    //                }
+    //                else {
+    //
+    //                    fail_f && fail_f();
+    //                }
+    //            }, 1000);
+    //            return obj;
+    //        }
+    //        var aj = ajax();
+    //        aj.success(function () {
+    //            console.log('suc')
+    //        });
+    //        aj.fail(function () {
+    //            console.log('fail')
+    //        });
+    //    }
 
-                    succ_f && succ_f();
-                }
-                else {
 
-                    fail_f && fail_f();
-                }
-            }, 1000);
-            return obj;
-        }
-        var aj = ajax();
-        aj.success(function () {
-            console.log('suc')
-        });
-        aj.fail(function () {
-            console.log('fail')
-        });
-    }
-
-
-{   //promise
+    //    promise
     function Promise(f) {
-        var suc_callBack = function () {
+        var that = this;
+        this.suc_callBacks = this.suc_callBacks || [];
+        this.fail_callBack = function () {
+        };
+
+        var suc = function (e) {
+                    var fun = (that.suc_callBacks.length && that.suc_callBacks.shift() ) || function () {
+                                    },
+                            returnVal = fun(e);
+                    if (returnVal instanceof Promise) {
+                        returnVal.suc_callBacks = that.suc_callBacks;
+                        returnVal.fail_callBack = that.fail_callBack;
+                    }
                 },
-                fail_callBack = function () {
-                },
-                suc=function (e) {
-                    suc_callBack(e)
-                },
-                fail=function (e) {
-                    fail_callBack(e);
-                }
+                fail = function (e) {
+                    that.fail_callBack(e);
+                };
 
         this.then = function (f) {
-            console.log(f)
-            suc_callBack = f;
-
-            return this;
+            that.suc_callBacks.push(f);
+            return that;
         };
         this.catch = function (f) {
-            fail_callBack = f;
-            return this;
+            that.fail_callBack = f;
         }
 
-        f(suc, fail);
+        setTimeout(function () {
+            f(suc, fail);
+        }, 0)
 
     }
+
     function test(resolve, reject) {
         setTimeout(function () {
             var num = Math.random();
             if (num < .5) {
-                console.log(resolve)
                 resolve('succ');
             }
             else {
-                console.log(reject)
                 reject('404');
             }
         }, 1000);
@@ -87,8 +92,38 @@
         console.log(re)
     }).catch(function (e) {
         console.log('siba:' + e)
+    });
+
+
+    // 0.5秒后返回input*input的计算结果:
+    function multiply(input) {
+        return new Promise(function (resolve, reject) {
+            console.log('calculating ' + input + ' x ' + input + '...');
+            setTimeout(resolve, 500, input * input);
+        });
+    }
+
+    // 0.5秒后返回input+input的计算结果:
+    function add(input) {
+        return new Promise(function (resolve, reject) {
+            console.log('calculating ' + input + ' + ' + input + '...');
+            setTimeout(resolve, 500, input + input);
+        });
+    }
+
+    new Promise(function (resolve, reject) {
+        console.log('start new Promise...');
+        resolve(123);
     })
-}
+            .then(multiply)
+            .then(add)
+            .then(multiply)
+            .then(add)
+            .then(function (result) {
+                console.log('Got value: ' + result);
+            }).catch(function (e) {
+        console.error('err:' + e);
+    })
 
 
 </script>
