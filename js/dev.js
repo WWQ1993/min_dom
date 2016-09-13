@@ -19,12 +19,15 @@ var w = {};
             if (arg.indexOf('<') > -1) return new Element([string2Dom(arg)]);
             else return new Element(document.querySelectorAll(arg));
         }
-        if (arg instanceof HTMLElement || arg === window || arg === document) return new Element([arg]);
+        if ($.isHTMLElement(arg)) return new Element([arg]);
 
         if (typeof arg === 'function') {
             if (document.readyState != 'loading') arg();
             else document.addEventListener('DOMContentLoaded', arg);
+
+            return new Element([document]);
         }
+        return arg;
     };
 
     function Element(nodeList) {
@@ -94,7 +97,7 @@ var w = {};
             } else if (typeof arg === 'string') {
                 return slice.call(this, 0).indexOf(document.querySelectorAll(arg)[0]);
             } else {
-                var ele = arg instanceof HTMLElement ? arg : arg[0];
+                var ele = $.isHTMLElement(arg) ? arg : arg[0];
                 return slice.call(this, 0).indexOf(ele);
 
             }
@@ -135,14 +138,13 @@ var w = {};
             }
             return arr;
         },
-        append: function () {
 
-        },
         is: function (str) {
             if (typeof str === 'string') {
                 var sel = str;
                 var matches = function (el, selector) {
-                        return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
+                        return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector ||
+                        el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
                     },
                     returnVal = false;
                 this.each(function (ele) {
@@ -179,70 +181,6 @@ var w = {};
         clone: function () {
             return new Element([this[0].cloneNode(true)]);
         },
-        append: function () {
-
-        },
-        prepend: function () {
-
-        },
-
-        after: function (arg) {
-            if (arg instanceof Element) {
-                arg.remove();
-                this.each(function (target, b) {
-                    var afterNode = target.nextElementSibling;
-                    if (!afterNode) {
-                        arg.each(function (ele) {
-                            target.parentNode.appendChild(ele.cloneNode(true));
-                        })
-                    }
-                    else {
-                        arg.each(function (ele) {
-                            afterNode.parentNode.insertBefore(ele.cloneNode(true), afterNode);
-                        })
-                    }
-                })
-            }
-            else if (arg instanceof HTMLElement) {
-                arg.parentNode.removeChild(arg);
-                this.each(function (target) {
-                    if (!target.nextElementSibling) {
-                        target.parentNode.appendChild(arg.cloneNode(true));
-                    }
-                    else {
-                        target.parentNode.insertBefore(arg.cloneNode(true), target.nextElementSibling);
-                    }
-                });
-            }
-            else if (typeof arg === 'string') {
-                this.each(function (target) {
-                    target.insertAdjacentHTML('afterend', arg);
-                });
-            }
-            return this;
-        },
-        before: function (arg) {
-            if (arg instanceof Element) {
-                arg.remove();
-                this.each(function (target, b) {
-                    arg.each(function (ele) {
-                        target.parentNode.insertBefore(ele.cloneNode(true), target);
-                    })
-                })
-            }
-            else if (arg instanceof HTMLElement) {
-                arg.parentNode.removeChild(arg);
-                this.each(function (target) {
-                    target.parentNode.insertBefore(arg.cloneNode(true), target);
-                });
-            }
-            else if (typeof arg === 'string') {
-                this.each(function (target) {
-                    target.insertAdjacentHTML('beforebegin', arg);
-                });
-            }
-            return this;
-        },
         scrollTop: function (arg) {
             var target = (this[0] === window || this[0] === document) ? document.body : this[0];
 
@@ -263,6 +201,15 @@ var w = {};
             }
             else {
                 return target.scrollLeft;
+            }
+        },
+        offset: function () {
+            var rect = this[0].getBoundingClientRect();
+            return {
+                top: rect.top + document.body.scrollTop,
+                left: rect.left + document.body.scrollLeft,
+                width: rect.width,
+                height:rect.height
             }
         },
 
@@ -292,6 +239,15 @@ var w = {};
             else {
                 return target.css('height').split('px')[0];
             }
+        },
+
+        insertBefore: function (arg) {
+            $(arg).before(this);
+            return this;
+        },
+        insertAfter: function (arg) {
+            $(arg).after(this);
+            return this;
         },
 
         //Style
@@ -444,7 +400,8 @@ var w = {};
                     });
                 });
                 return this;
-            };
+            }
+            ;
         },
         off: function (arg0) {
             var arg = arguments;
@@ -515,15 +472,15 @@ var w = {};
                 this.dispatchEvent(event);
             });
         },
-        one:function () {
-            
+        one: function () {
+
         }
 
     };
 
 
     function bindEvent(obj) {
-        
+
         obj.ele.addEventListener(obj.type.split('.')[0], originHandler);
         obj.ele.event = obj.ele.event || {};
         obj.ele.event[obj.type] = obj.ele.event[obj.type] || [];
@@ -552,11 +509,76 @@ var w = {};
         return a.firstChild;
     }
 
+    var domOperateFuns = {
+        'append': function (target, src) {
+            target.appendChild(string2Dom(src));
+        },
+        'prepend': function (target, src) {
+            var firstC = target.firstChild;
+            if (firstC) {
+                target.insertBefore(string2Dom(src), firstC);
+            }
+            else {
+                target.appendChild(string2Dom(src));
+            }
+        },
+        'after': function (target, src) {
+            target.insertAdjacentHTML('afterend', src);
+
+        },
+        'before': function (target, src) {
+            target.insertAdjacentHTML('beforebegin', src);
+        }
+
+    }
+
+
+    function domOperate(method, target, src) {
+
+        if (typeof src === 'string') {  //  对象是htmlString
+            target.each(function (ele) {
+                domOperateFuns[method](ele, src);
+            })
+        }
+        else if ($.isHTMLElement(src)) { //  对象是html element
+            if (target.length < 2) {
+                $(src).remove();
+            }
+            domOperate(method, target, src.outerHTML);
+        }
+        else if (src instanceof Element) {  //是$元素
+            if (method === 'before' || method === 'append') {
+                src.each(function (ele) {
+                    domOperate(method, target, ele);
+                })
+            }
+            else {   //  纠正插入顺序
+                for (var i = src.length; i >= 0; i--) {
+                    domOperate(method, target, src[i]);
+                }
+            }
+        }
+    }
+
+    !function (methodArr) {
+        function addFunction(method) {
+            Element.prototype[method] = function (arg) {
+                domOperate(method, this, arg)
+                return this;
+            }
+        }
+
+        for (var i = 0; i < methodArr.length; i++) {
+            addFunction(methodArr[i])
+
+        }
+    }(['append', 'prepend', 'after', 'before']);
+
     //设置原生事件
-    !function (obj, arr) {
+    !function (arr) {
 
         function addFunction(type) {
-            obj[type] = function (arg, arg1) {
+            Element.prototype[type] = function (arg, arg1) {
                 if (!arg) {
                     this.trigger(type);
                     return this;
@@ -575,7 +597,9 @@ var w = {};
         for (var i = 0; i < arr.length; i++) {
             addFunction(arr[i]);
         }
-    }(Element.prototype, ['blur', 'focusin', 'mousedown', 'mouseup', 'change', 'focusout', 'mouseenter', 'resize', 'click', 'keydown', 'mouseleave', 'scroll', 'dbclick', 'keypress', 'mousemove', 'select', 'error', 'keyup', 'mouseout', 'submit', 'focus', 'load', 'mouseover', 'unload', 'tap', 'touchstart', 'touchmove', 'touchend'])
+    }(['blur', 'focusin', 'mousedown', 'mouseup', 'change', 'focusout', 'mouseenter', 'resize',
+        'click', 'keydown', 'mouseleave', 'scroll', 'dbclick', 'keypress', 'mousemove', 'select', 'error', 'keyup',
+        'mouseout', 'submit', 'focus', 'load', 'mouseover', 'unload', 'tap', 'touchstart', 'touchmove', 'touchend']);
 
     //static function
     $.fn = Element.prototype;
@@ -637,6 +661,9 @@ var w = {};
     };
     $.isArray = function (arr) {
         return Object.prototype.toString.call(arr) === "[object Array]"
+    };
+    $.isHTMLElement = function (ele) {
+        return (ele instanceof HTMLElement) || ele === window || ele === document
     };
     $.each = function (elements, callback) {
         var i, key;

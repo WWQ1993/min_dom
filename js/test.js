@@ -40,31 +40,31 @@
 //    console.log($('.a').index('.aa'))
 
 
-describe("DOM_operation", function () {
-    it("", function () {
-        expect().toBe();
-    });
-    it("index", function () {
-        expect($('.a').index('.aa')).toBe(w.$('.a').index('.aa'));
-        expect($('.a').index($('.aa'))).toBe(w.$('.a').index($('.aa')));
-        expect($('.a').index($('.aa')[0])).toBe(w.$('.a').index($('.aa')[0]));
-    });
-    it("clone", function () {
-        var node2 = w.$('.aaa');
-        var length = $('.a').length;
-        w.$('.a').before(node2);
-
-        expect($('.a').length).toBe(length);
-    });
-    it('scrollTop、scrollLeft', function () {
-        var top1 = $('body').scrollTop();
-        var top2 = w.$('body').scrollTop();
-        var left1 = $('body').scrollLeft();
-        var left2 = w.$('body').scrollLeft();
-        expect(top1).toBe(top2);
-        expect(left1).toBe(left2);
-    });
-});
+// describe("DOM_operation", function () {
+//     it("", function () {
+//         expect().toBe();
+//     });
+//     it("index", function () {
+//         expect($('.a').index('.aa')).toBe(w.$('.a').index('.aa'));
+//         expect($('.a').index($('.aa'))).toBe(w.$('.a').index($('.aa')));
+//         expect($('.a').index($('.aa')[0])).toBe(w.$('.a').index($('.aa')[0]));
+//     });
+//     it("clone", function () {
+//         var node2 = w.$('.aaa');
+//         var length = $('.a').length;
+//         w.$('.a').before(node2);
+//
+//         expect($('.a').length).toBe(length);
+//     });
+//     it('scrollTop、scrollLeft', function () {
+//         var top1 = $('body').scrollTop();
+//         var top2 = w.$('body').scrollTop();
+//         var left1 = $('body').scrollLeft();
+//         var left2 = w.$('body').scrollLeft();
+//         expect(top1).toBe(top2);
+//         expect(left1).toBe(left2);
+//     });
+// });
 
 // w.$('.on').on({
 //     'click.on': function (e) {
@@ -78,24 +78,29 @@ describe("DOM_operation", function () {
 function cc(e) {
     console.log(e)
 };
-$('div').on('click.on','.on', {a: 132}, cc);
+$('div').on('click.on', '.on', {a: 132}, cc);
 // w.$('.on').on('click.on', {a: 132}, function (e) {
 //     console.log('234234')
 // });
 // w.$('.on').trigger('click')
 
-console.log(w.$(function () {}))
+console.log(w.$(function () {
+}))
 
 // w.$('.on').off('click.bb',cc);
 // w.$('.on').off('mouseover.a');
 // w.$('.on').before(w.$('<input type="text"/>'));
 // console.log(w.$('<input type="text"/>'))
 document.body.appendChild(w.$('<div style="color:red;"><b>234</b><div>d</div></div>')[0]);
-$(window).on('clickk', function () {
+$(window).on('clickc', function () {
     w.$.ajax({
         dataType: 'json',
         type: 'GET',
-        data: 'industry=electronic&cityId=435&page=1&size=3',
+        data: {
+            industry: 'electronic',
+            cityId: '435',
+            size: '3'
+        },
         url: 'http://op.chinahr.com/2016spring/api/getIndustryListByPage',
         success: function (e) {
             console.log(e)
@@ -107,40 +112,39 @@ $(window).on('clickk', function () {
         },
         error: function (xhr, type, err) {
             console.log(arguments)
-
         }
         ,
         beforeSend: function () {
-            console.log(arguments)
+            // console.log(arguments)
         }
     });
 
     //http://cache.video.iqiyi.com/jp/avlist/202861101/1/
     //http://qzone-music.qq.com/fcg-bin/fcg_music_fav_getinfo.fcg?dirinfo=0&dirid=1&uin=QQ%E5%8F%B7&p=0.519638272547262&g_tk=128423485
-    w.$.ajax({
-        dataType: 'jsonp',
-        url: 'http://cache.video.iqiyi.com/jp/avlist/202861101/1/',
-        type: 'GET',
-        jsonpCallback: 'callbackaaa',
-        timeout: 1000,
-        success: function (e) {
-            console.log(arguments)
-        },
-        complete: function (e) {
-            console.log(arguments)
-        },
-
-        error: function (xhr, type, err) {
-            console.log(arguments)
-
-        },
-        beforeSend: function () {
-            console.log(arguments)
-        }
-    });
+    // w.$.ajax({
+    //     dataType: 'jsonp',
+    //     url: 'http://cache.video.iqiyi.com/jp/avlist/202861101/1/',
+    //     type: 'GET',
+    //     jsonpCallback: 'callbackaaa',
+    //     timeout: 1000,
+    //     success: function (e) {
+    //         console.log(arguments)
+    //     },
+    //     complete: function (e) {
+    //         console.log(arguments)
+    //     },
+    //
+    //     error: function (xhr, type, err) {
+    //         console.log(arguments)
+    //
+    //     },
+    //     beforeSend: function () {
+    //         console.log(arguments)
+    //     }
+    // });
 
 });
-w.$(window).click( function (e) {
+w.$(window).click(function (e) {
     console.log(e.data.a)
 });
 
@@ -162,15 +166,13 @@ console.log((obj))
 console.log(w.$.param(obj))
 console.log(decodeURIComponent($.param(obj)));
 
-$('.target').append($('.on'));
+// $('.target').append($('.on'));
 
 console.log($('div').index($('.on')[1]));
 
 
-
-
 var obj = {
-    a: {a:1,b:[[22,33],2]},
+    a: {a: 1, b: [[22, 33], 2]},
     b: {
         c: '为地方',
         d: 3,
@@ -181,10 +183,16 @@ var obj = {
 
 describe("para", function () {
     it("pa", function () {
-        expect(decodeURIComponent($.param(obj)) ).toBe(w.$.param(obj));
+        expect(decodeURIComponent($.param(obj))).toBe(w.$.param(obj));
     });
 });
 
-w.$.ajax({
-    data:obj
-});
+// w.$.ajax({
+//     data: obj
+// });
+
+// w.$(document.body).append(w.$('.a'))
+   $(document.body).append($('.a'));
+
+console.log($('.aaa').offset())
+console.log(w.$('.aaa').offset())
