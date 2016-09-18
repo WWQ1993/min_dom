@@ -92,7 +92,7 @@ console.log(w.$(function () {
 // w.$('.on').before(w.$('<input type="text"/>'));
 // console.log(w.$('<input type="text"/>'))
 document.body.appendChild(w.$('<div style="color:red;"><b>234</b><div>d</div></div>')[0]);
-$(window).on('clickc', function () {
+w.$(window).one('clicck', function () {
     w.$.ajax({
         dataType: 'json',
         type: 'GET',
@@ -144,12 +144,7 @@ $(window).on('clickc', function () {
     // });
 
 });
-w.$(window).click(function (e) {
-    console.log(e.data.a)
-});
 
-
-w.$(window).click();
 //
 // $.ajax({
 //     dataType:'json',
@@ -185,6 +180,22 @@ describe("para", function () {
     it("pa", function () {
         expect(decodeURIComponent($.param(obj))).toBe(w.$.param(obj));
     });
+    it("height", function () {
+
+        expect(w.$('.on').height()).toBe($('.on').height());
+        expect(w.$(document).height()).toBe($(document).height());
+        expect(w.$(window).height()).toBe($(window).height());
+
+    });
+    it("width", function () {
+
+        expect(w.$('.on').width()).toBe($('.on').width());
+        expect(w.$(document).width()).toBe($(document).width());
+        expect(w.$(window).width()).toBe($(window).width());
+
+        w.$('.on').width(200);
+        expect(w.$('.on').width()).toBe(200);
+    });
 });
 
 // w.$.ajax({
@@ -192,7 +203,16 @@ describe("para", function () {
 // });
 
 // w.$(document.body).append(w.$('.a'))
-   $(document.body).append($('.a'));
+$(document.body).append($('.a'));
 
 console.log($('.aaa').offset())
-console.log(w.$('.aaa').offset())
+console.log(w.$('.aaa').offset());
+
+
+w.$('.on').one('click', function (e) {
+    console.log('on')
+})
+
+w.$('.on').eq(0).toggle();
+w.$('.on').toggle();
+
