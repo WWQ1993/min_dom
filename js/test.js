@@ -216,3 +216,36 @@ w.$('.on').one('click', function (e) {
 w.$('.on').eq(0).toggle();
 w.$('.on').toggle();
 
+
+ describe("DOM_operation", function () {
+     it("siblings", function () {
+         expect(w.$('.target').siblings().length).toBe($('.target').siblings().length);
+         expect(w.$('.target').siblings('.ff').length).toBe($('.target').siblings('.ff').length);
+         expect(w.$('div').siblings('.ff').length).toBe($('div').siblings('.ff').length);
+     });
+     it("find", function () {
+         expect(w.$('.target').find().length).toBe($('.target').find().length);
+         expect(w.$('.target').find('.ff').length).toBe($('.target').find('.ff').length);
+         expect(w.$('div').find('.ff').length).toBe($('div').find('.ff').length);
+     });
+     it("children", function () {
+         expect(w.$('.target').children().length).toBe($('.target').children().length);
+         expect(w.$('.target').children('.ff').length).toBe($('.target').children('.ff').length);
+         expect(w.$('div').children('.on').length).toBe($('div').children('.on').length);
+     });
+ });
+
+
+setTimeout(function () {
+    console.log($('#se')[0])
+},2000)
+w.$('#tt').val('sdf')
+
+w.$('.target').animate({width:'900px'});
+
+// w.$('.target').replaceWith('<h1>4234</h1>');
+//  $('.target').replaceWith('<h1>4234</h1>');
+w.$('<h1>4234</h1>').replaceAll(w.$('.target'));
+
+
+
